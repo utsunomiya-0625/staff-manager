@@ -9,6 +9,8 @@ import {
   Package,
   Clock,
   Receipt,
+  CalendarDays,
+  MessageCircleQuestion,
   Shield,
   Users,
   LogOut,
@@ -18,9 +20,11 @@ const navItems = [
   { href: "/dashboard", label: "ダッシュボード", icon: LayoutDashboard },
   { href: "/reports", label: "日報", icon: FileText },
   { href: "/tasks", label: "作業計画", icon: CheckSquare },
+  { href: "/schedule", label: "勤務予定", icon: CalendarDays },
   { href: "/devbox", label: "開発ボックス", icon: Package },
   { href: "/attendance", label: "勤怠管理", icon: Clock },
   { href: "/invoices", label: "請求書", icon: Receipt },
+  { href: "/questions", label: "相談・質問", icon: MessageCircleQuestion },
 ];
 
 const adminItems = [

@@ -72,6 +72,47 @@ export interface AttendanceRecord {
   total_pay?: number;
 }
 
+export type WorkLocation = "office" | "remote" | "off" | "undecided";
+
+export interface WeeklyScheduleDay {
+  date: string;
+  location: WorkLocation;
+  note: string;
+}
+
+export interface WeeklySchedule {
+  id: string;
+  user_id: string;
+  week_start: string;
+  days: WeeklyScheduleDay[];
+  created_at: string;
+  updated_at: string;
+}
+
+export type QuestionStatus = "open" | "resolved";
+export type QuestionCategory = "general" | "tech" | "hr" | "other";
+
+export interface QuestionReply {
+  id: string;
+  user_id: string;
+  user_name: string;
+  content: string;
+  created_at: string;
+}
+
+export interface Question {
+  id: string;
+  user_id: string;
+  user_name: string;
+  title: string;
+  content: string;
+  category: QuestionCategory;
+  status: QuestionStatus;
+  replies: QuestionReply[];
+  created_at: string;
+  updated_at: string;
+}
+
 export type InvoiceStatus = "draft" | "sent" | "paid";
 
 export interface InvoiceItem {

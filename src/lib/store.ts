@@ -4,6 +4,8 @@ import type {
   DailyTask,
   Project,
   Invoice,
+  WeeklySchedule,
+  Question,
 } from "./types";
 
 const STORAGE_KEYS = {
@@ -12,6 +14,8 @@ const STORAGE_KEYS = {
   TASKS: "sm_tasks",
   PROJECTS: "sm_projects",
   INVOICES: "sm_invoices",
+  SCHEDULES: "sm_schedules",
+  QUESTIONS: "sm_questions",
 } as const;
 
 function getItem<T>(key: string, fallback: T): T {
@@ -124,5 +128,40 @@ export const store = {
     const invoices = this.getInvoices();
     const num = invoices.length + 1;
     return `INV-${String(num).padStart(4, "0")}`;
+  },
+
+  getSchedules(): WeeklySchedule[] {
+    return getItem(STORAGE_KEYS.SCHEDULES, []);
+  },
+  getScheduleByWeek(weekStart: string): WeeklySchedule | undefined {
+    return this.getSchedules().find((s) => s.week_start === weekStart);
+  },
+  saveSchedule(schedule: WeeklySchedule) {
+    const schedules = this.getSchedules();
+    const idx = schedules.findIndex((s) => s.id === schedule.id);
+    if (idx >= 0) {
+      schedules[idx] = schedule;
+    } else {
+      schedules.unshift(schedule);
+    }
+    setItem(STORAGE_KEYS.SCHEDULES, schedules);
+  },
+
+  getQuestions(): Question[] {
+    return getItem(STORAGE_KEYS.QUESTIONS, []);
+  },
+  saveQuestion(question: Question) {
+    const questions = this.getQuestions();
+    const idx = questions.findIndex((q) => q.id === question.id);
+    if (idx >= 0) {
+      questions[idx] = question;
+    } else {
+      questions.unshift(question);
+    }
+    setItem(STORAGE_KEYS.QUESTIONS, questions);
+  },
+  deleteQuestion(id: string) {
+    const questions = this.getQuestions().filter((q) => q.id !== id);
+    setItem(STORAGE_KEYS.QUESTIONS, questions);
   },
 };
