@@ -79,6 +79,42 @@ create policy "Authenticated users can insert projects" on projects for insert w
 create policy "Authenticated users can update projects" on projects for update using (auth.uid() is not null);
 create policy "Authenticated users can delete projects" on projects for delete using (auth.uid() is not null);
 
+-- weekly_schedules: 勤務予定
+create table if not exists weekly_schedules (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid references profiles(id) on delete cascade not null,
+  week_start date not null,
+  days jsonb not null default '[]',
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  unique(user_id, week_start)
+);
+
+alter table weekly_schedules enable row level security;
+create policy "Users can view all schedules" on weekly_schedules for select using (true);
+create policy "Users can insert own schedules" on weekly_schedules for insert with check (auth.uid() = user_id);
+create policy "Users can update own schedules" on weekly_schedules for update using (auth.uid() = user_id);
+
+-- questions: 相談・質問
+create table if not exists questions (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid references profiles(id) on delete cascade not null,
+  user_name text not null default '',
+  title text not null,
+  content text not null default '',
+  category text not null default 'general' check (category in ('general', 'tech', 'hr', 'other')),
+  status text not null default 'open' check (status in ('open', 'resolved')),
+  replies jsonb not null default '[]',
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+alter table questions enable row level security;
+create policy "Anyone can view questions" on questions for select using (true);
+create policy "Authenticated users can insert questions" on questions for insert with check (auth.uid() is not null);
+create policy "Authenticated users can update questions" on questions for update using (auth.uid() is not null);
+create policy "Users can delete own questions" on questions for delete using (auth.uid() = user_id);
+
 -- trigger: auto-create profile on signup
 create or replace function public.handle_new_user()
 returns trigger as $$
