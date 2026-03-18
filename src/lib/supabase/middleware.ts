@@ -36,10 +36,12 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const isAuthPage = request.nextUrl.pathname === "/login";
-  const isCallback = request.nextUrl.pathname.startsWith("/auth/");
+  const pathname = request.nextUrl.pathname;
+  const isAuthPage = pathname === "/login";
+  const isCallback = pathname.startsWith("/auth/");
+  const isDenied = pathname === "/denied";
 
-  if (!user && !isAuthPage && !isCallback) {
+  if (!user && !isAuthPage && !isCallback && !isDenied) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     return NextResponse.redirect(url);
@@ -49,6 +51,20 @@ export async function updateSession(request: NextRequest) {
     const url = request.nextUrl.clone();
     url.pathname = "/dashboard";
     return NextResponse.redirect(url);
+  }
+
+  if (user && pathname.startsWith("/admin")) {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .single();
+
+    if (!profile || profile.role !== "admin") {
+      const url = request.nextUrl.clone();
+      url.pathname = "/denied";
+      return NextResponse.redirect(url);
+    }
   }
 
   return supabaseResponse;

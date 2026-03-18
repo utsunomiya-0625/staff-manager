@@ -1,7 +1,9 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { store } from "@/lib/store";
 import {
   LayoutDashboard,
   FileText,
@@ -18,14 +20,11 @@ import {
   ScrollText,
   Calculator,
   BookOpen,
-  ListChecks,
   Timer,
-  Map,
   FolderOpen,
   MessageSquare,
   Sparkles,
   Award,
-  Building2,
   LogOut,
 } from "lucide-react";
 
@@ -57,6 +56,24 @@ const adminItems = [
 
 export function Sidebar() {
   const pathname = usePathname();
+  const router = useRouter();
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    const profile = store.getProfile();
+    setIsAdmin(profile.role === "admin");
+  }, []);
+
+  const handleLogout = async () => {
+    try {
+      const { createClient } = await import("@/lib/supabase/client");
+      const supabase = createClient();
+      await supabase.auth.signOut();
+    } catch {
+      // Supabase 未接続時は localStorage をクリアしてリダイレクト
+    }
+    router.push("/login");
+  };
 
   return (
     <aside className="fixed left-0 top-0 z-40 flex h-screen w-64 flex-col bg-sidebar-bg text-sidebar-text">
@@ -88,32 +105,39 @@ export function Sidebar() {
           })}
         </ul>
 
-        <div className="mt-4 mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-muted">
-          管理者メニュー
-        </div>
-        <ul className="space-y-0.5">
-          {adminItems.map((item) => {
-            const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
-            const Icon = item.icon;
-            return (
-              <li key={item.href}>
-                <Link
-                  href={item.href}
-                  className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
-                    isActive ? "bg-sidebar-active text-white" : "text-sidebar-text hover:bg-sidebar-hover"
-                  }`}
-                >
-                  <Icon size={18} />
-                  {item.label}
-                </Link>
-              </li>
-            );
-          })}
-        </ul>
+        {isAdmin && (
+          <>
+            <div className="mt-4 mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-muted">
+              管理者メニュー
+            </div>
+            <ul className="space-y-0.5">
+              {adminItems.map((item) => {
+                const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
+                const Icon = item.icon;
+                return (
+                  <li key={item.href}>
+                    <Link
+                      href={item.href}
+                      className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+                        isActive ? "bg-sidebar-active text-white" : "text-sidebar-text hover:bg-sidebar-hover"
+                      }`}
+                    >
+                      <Icon size={18} />
+                      {item.label}
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          </>
+        )}
       </nav>
 
       <div className="border-t border-white/10 p-3">
-        <button className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-sidebar-text hover:bg-sidebar-hover transition-colors">
+        <button
+          onClick={handleLogout}
+          className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-sidebar-text hover:bg-sidebar-hover transition-colors"
+        >
           <LogOut size={18} />
           ログアウト
         </button>
