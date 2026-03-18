@@ -8,6 +8,7 @@ import {
   CheckSquare,
   Package,
   Clock,
+  Receipt,
   Shield,
   Users,
   LogOut,
@@ -19,6 +20,7 @@ const navItems = [
   { href: "/tasks", label: "作業計画", icon: CheckSquare },
   { href: "/devbox", label: "開発ボックス", icon: Package },
   { href: "/attendance", label: "勤怠管理", icon: Clock },
+  { href: "/invoices", label: "請求書", icon: Receipt },
 ];
 
 const adminItems = [

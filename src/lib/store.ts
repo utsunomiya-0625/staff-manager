@@ -3,6 +3,7 @@ import type {
   DailyReport,
   DailyTask,
   Project,
+  Invoice,
 } from "./types";
 
 const STORAGE_KEYS = {
@@ -10,6 +11,7 @@ const STORAGE_KEYS = {
   REPORTS: "sm_reports",
   TASKS: "sm_tasks",
   PROJECTS: "sm_projects",
+  INVOICES: "sm_invoices",
 } as const;
 
 function getItem<T>(key: string, fallback: T): T {
@@ -99,5 +101,28 @@ export const store = {
   deleteProject(id: string) {
     const projects = this.getProjects().filter((p) => p.id !== id);
     setItem(STORAGE_KEYS.PROJECTS, projects);
+  },
+
+  getInvoices(): Invoice[] {
+    return getItem(STORAGE_KEYS.INVOICES, []);
+  },
+  saveInvoice(invoice: Invoice) {
+    const invoices = this.getInvoices();
+    const idx = invoices.findIndex((i) => i.id === invoice.id);
+    if (idx >= 0) {
+      invoices[idx] = invoice;
+    } else {
+      invoices.unshift(invoice);
+    }
+    setItem(STORAGE_KEYS.INVOICES, invoices);
+  },
+  deleteInvoice(id: string) {
+    const invoices = this.getInvoices().filter((i) => i.id !== id);
+    setItem(STORAGE_KEYS.INVOICES, invoices);
+  },
+  getNextInvoiceNumber(): string {
+    const invoices = this.getInvoices();
+    const num = invoices.length + 1;
+    return `INV-${String(num).padStart(4, "0")}`;
   },
 };

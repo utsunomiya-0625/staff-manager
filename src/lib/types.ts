@@ -71,3 +71,40 @@ export interface AttendanceRecord {
   hourly_rate: number;
   total_pay?: number;
 }
+
+export type InvoiceStatus = "draft" | "sent" | "paid";
+
+export interface InvoiceItem {
+  date: string;
+  description: string;
+  hours: number;
+  rate: number;
+  subtotal: number;
+}
+
+export interface Invoice {
+  id: string;
+  invoice_number: string;
+  user_id: string;
+  status: InvoiceStatus;
+  billing_period: string;
+  issue_date: string;
+  due_date: string;
+  biller_name: string;
+  biller_address: string;
+  biller_bank: string;
+  biller_bank_branch: string;
+  biller_account_type: string;
+  biller_account_number: string;
+  biller_account_name: string;
+  client_name: string;
+  client_address: string;
+  items: InvoiceItem[];
+  subtotal: number;
+  tax_rate: number;
+  tax_amount: number;
+  total: number;
+  notes: string;
+  created_at: string;
+  updated_at: string;
+}
