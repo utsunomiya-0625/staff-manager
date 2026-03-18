@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { store } from "@/lib/store";
 import {
   LayoutDashboard,
   FileText,
@@ -60,8 +59,28 @@ export function Sidebar() {
   const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
-    const profile = store.getProfile();
-    setIsAdmin(profile.role === "admin");
+    async function checkRole() {
+      try {
+        const { createClient } = await import("@/lib/supabase/client");
+        const supabase = createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          const { data: profile } = await supabase
+            .from("profiles")
+            .select("role")
+            .eq("id", user.id)
+            .single();
+          setIsAdmin(profile?.role === "admin");
+          return;
+        }
+      } catch {
+        // Supabase 未接続時はフォールバック
+      }
+      const { store } = await import("@/lib/store");
+      const profile = store.getProfile();
+      setIsAdmin(profile.role === "admin");
+    }
+    checkRole();
   }, []);
 
   const handleLogout = async () => {
@@ -70,7 +89,7 @@ export function Sidebar() {
       const supabase = createClient();
       await supabase.auth.signOut();
     } catch {
-      // Supabase 未接続時は localStorage をクリアしてリダイレクト
+      // Supabase 未接続時
     }
     router.push("/login");
   };
