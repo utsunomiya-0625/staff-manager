@@ -13,6 +13,7 @@ import {
   Trash2,
   GripVertical,
 } from "lucide-react";
+import { logActivity } from "@/lib/activity";
 import { v4 as uuidv4 } from "uuid";
 
 const statusConfig: Record<TaskStatus, { label: string; color: string; bg: string }> = {
@@ -58,13 +59,16 @@ export default function TasksPage() {
     });
     setNewTitle("");
     setShowForm(false);
+    logActivity("task_add", `タスク追加: ${newTitle.trim()}`);
     loadTasks();
   };
 
   const toggleStatus = (task: DailyTask) => {
     const order: TaskStatus[] = ["todo", "in_progress", "done"];
     const nextIdx = (order.indexOf(task.status) + 1) % order.length;
-    store.saveTask({ ...task, status: order[nextIdx] });
+    const nextStatus = order[nextIdx];
+    store.saveTask({ ...task, status: nextStatus });
+    if (nextStatus === "done") logActivity("task_done", `タスク完了: ${task.title}`);
     loadTasks();
   };
 

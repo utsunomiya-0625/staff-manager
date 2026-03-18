@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from "react";
 import { Header } from "@/components/layout/header";
 import { store } from "@/lib/store";
 import type { WeeklySchedule, WeeklyScheduleDay, WorkLocation } from "@/lib/types";
+import { logActivity } from "@/lib/activity";
 import {
   format,
   startOfWeek,
@@ -145,6 +146,7 @@ export default function SchedulePage() {
       updated_at: now,
     };
     store.saveSchedule(schedule);
+    logActivity("schedule_save", `週間予定を保存: ${weekStart}`);
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
   };

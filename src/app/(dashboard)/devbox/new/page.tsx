@@ -8,6 +8,7 @@ import type { ProjectStatus } from "@/lib/types";
 import { Save, ArrowLeft, Plus, X } from "lucide-react";
 import Link from "next/link";
 import { v4 as uuidv4 } from "uuid";
+import { logActivity } from "@/lib/activity";
 
 export default function NewProjectPage() {
   const router = useRouter();
@@ -53,6 +54,7 @@ export default function NewProjectPage() {
       created_at: now,
       updated_at: now,
     });
+    logActivity("project_edit", `プロジェクト登録: ${name}`);
     router.push("/devbox");
   };
 

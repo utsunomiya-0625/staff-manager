@@ -10,6 +10,7 @@ import { ja } from "date-fns/locale";
 import { Save, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { v4 as uuidv4 } from "uuid";
+import { logActivity } from "@/lib/activity";
 
 const resultOptions: { value: ReportResult; label: string }[] = [
   { value: "achieved", label: "達成" },
@@ -48,6 +49,7 @@ export default function NewReportPage() {
       created_at: now,
       updated_at: now,
     });
+    logActivity("report_submit", `${date} の日報を提出: ${goal}`);
     router.push("/reports");
   };
 

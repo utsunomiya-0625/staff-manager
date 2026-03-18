@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Header } from "@/components/layout/header";
 import { store } from "@/lib/store";
 import type { Question, QuestionCategory, QuestionStatus, QuestionReply } from "@/lib/types";
+import { logActivity } from "@/lib/activity";
 import { format } from "date-fns";
 import { ja } from "date-fns/locale";
 import {
@@ -71,6 +72,7 @@ export default function QuestionsPage() {
       updated_at: now,
     };
     store.saveQuestion(question);
+    logActivity("question_post", `質問投稿: ${newTitle}`);
     setQuestions(store.getQuestions());
     setNewTitle("");
     setNewContent("");

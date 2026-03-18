@@ -178,6 +178,53 @@ export default function DevBoxPage() {
           </div>
         )}
 
+        {projects.length > 0 && (
+          <div className="mt-8 rounded-xl border border-card-border bg-card-bg p-6">
+            <h3 className="mb-4 flex items-center gap-2 text-base font-bold">
+              <Package size={18} className="text-primary" />
+              プロジェクト進捗ヒートマップ
+            </h3>
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {projects.map((p) => {
+                const hue = p.progress > 75 ? "bg-success" : p.progress > 50 ? "bg-primary" : p.progress > 25 ? "bg-warning" : "bg-danger";
+                const opacity = Math.max(0.3, p.progress / 100);
+                return (
+                  <div
+                    key={p.id}
+                    className="group relative flex flex-col items-center justify-center rounded-lg border border-card-border p-4 text-center cursor-pointer hover:shadow-md transition-shadow"
+                    style={{ backgroundColor: `var(--color-${p.status === "completed" ? "success" : p.status === "on_hold" ? "warning" : "primary"})`, opacity }}
+                    onClick={() => setSelected(p)}
+                  >
+                    <div className="absolute inset-0 rounded-lg bg-card-bg/80" />
+                    <div className="relative z-10">
+                      <p className="text-sm font-bold truncate max-w-full">{p.name}</p>
+                      <div className="mt-1 flex items-center justify-center gap-2 text-xs text-muted">
+                        <span className={`inline-block h-2 w-2 rounded-full ${hue}`} />
+                        {p.progress}%
+                        <span className={`${statusConfig[p.status].color}`}>
+                          {statusConfig[p.status].label}
+                        </span>
+                      </div>
+                      <div className="mt-2 h-1.5 w-full rounded-full bg-background overflow-hidden">
+                        <div className={`h-full rounded-full ${hue} transition-all`} style={{ width: `${p.progress}%` }} />
+                      </div>
+                      {p.assignees.length > 0 && (
+                        <p className="mt-1 text-xs text-muted truncate">{p.assignees.join(", ")}</p>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+            <div className="mt-4 flex items-center gap-4 text-xs text-muted">
+              <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-danger" /> 0-25%</span>
+              <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-warning" /> 26-50%</span>
+              <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-primary" /> 51-75%</span>
+              <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-success" /> 76-100%</span>
+            </div>
+          </div>
+        )}
+
         {selected && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
             <div className="relative max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-2xl bg-card-bg shadow-2xl">

@@ -10,6 +10,7 @@ import { ja } from "date-fns/locale";
 import { Save, ArrowLeft, Plus, Trash2, Calculator } from "lucide-react";
 import Link from "next/link";
 import { v4 as uuidv4 } from "uuid";
+import { logActivity } from "@/lib/activity";
 
 export default function NewInvoicePage() {
   const router = useRouter();
@@ -119,6 +120,7 @@ export default function NewInvoicePage() {
       created_at: nowStr,
       updated_at: nowStr,
     });
+    logActivity("invoice_create", `請求書作成: ${billingMonth}`);
     router.push("/invoices");
   };
 
